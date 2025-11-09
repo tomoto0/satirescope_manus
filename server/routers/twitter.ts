@@ -252,4 +252,84 @@ export const twitterRouter = router({
         });
       }
     }),
+
+  /**
+   * Manually trigger a post for a specific config
+   */
+  manualPost: protectedProcedure
+    .input(z.object({ configId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        // Verify ownership
+        const config = await getTwitterConfigById(input.configId);
+        if (!config || config.userId !== ctx.user.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You do not have permission to post with this configuration",
+          });
+        }
+
+        if (!config.isActive) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "This configuration is not active. Please activate it first.",
+          });
+        }
+
+        // Import posting modules
+        const { fetchNewsArticles, processNewsArticle } = await import("../newsEngine");
+        const { postTweetWithImage } = await import("../twitterPoster");
+
+        // Get decrypted credentials
+        const credentials = {
+          xApiKey: decryptReversible(config.xApiKey),
+          xApiKeySecret: decryptReversible(config.xApiKeySecret),
+          xAccessToken: decryptReversible(config.xAccessToken),
+          xAccessTokenSecret: decryptReversible(config.xAccessTokenSecret),
+        };
+
+        // Fetch news
+        const articles = await fetchNewsArticles();
+        if (articles.length === 0) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "No news articles found to post",
+          });
+        }
+
+        // Use the first article
+        const article = articles[0];
+
+        // Generate satirical content
+        const content = await processNewsArticle(article);
+
+        // Post to Twitter
+        if (!content.imageUrl) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to generate image for post",
+          });
+        }
+
+        const result = await postTweetWithImage(
+          config,
+          content.tweetText,
+          content.imageUrl,
+          article.url
+        );
+
+        return {
+          success: true,
+          message: "Post published successfully!",
+          tweetId: result.tweetId || "unknown",
+        };
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        console.error("[Twitter Router] Failed to post manually:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error instanceof Error ? error.message : "Failed to publish post",
+        });
+      }
+    }),
 });

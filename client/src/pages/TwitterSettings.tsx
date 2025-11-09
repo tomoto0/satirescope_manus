@@ -5,15 +5,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { AlertCircle, CheckCircle, Trash2, Eye, EyeOff } from "lucide-react";
+import { AlertCircle, CheckCircle, Trash2, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { useLocation } from "wouter";
 
 /**
  * Twitter Settings Page
  * Allows users to register, update, and manage their Twitter API credentials
  */
 export default function TwitterSettings() {
+  const [, setLocation] = useLocation();
   const [showForm, setShowForm] = useState(false);
   const [showPasswords, setShowPasswords] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -109,10 +111,20 @@ export default function TwitterSettings() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Twitter Settings</h1>
-          <p className="text-slate-600">Manage your X (Twitter) API credentials for automated posting</p>
+        {/* Header with Back Button */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-slate-900 mb-2">Twitter Settings</h1>
+            <p className="text-slate-600">Manage your X (Twitter) API credentials for automated posting</p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setLocation("/")}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </Button>
         </div>
 
         {/* Configuration Form */}

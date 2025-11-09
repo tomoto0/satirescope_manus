@@ -91,3 +91,16 @@
 ## Phase 5: Final Delivery
 - [x] ユーザーガイド作成 (userGuide.md)
 - [x] 最終チェックポイント作成
+
+
+## Bug Fixes & Enhancements
+
+### Navigation Issues
+- [ ] Settings ページのナビゲーション問題を修正
+- [ ] Settings ページにホームへ戻るボタンを追加
+- [ ] Posted Tweets ページにホームへ戻るボタンを追加
+
+### Manual Posting Feature
+- [ ] 手動投稿トリガーAPI実装
+- [ ] ホームページに手動投稿ボタンを追加
+- [ ] 手動投稿の進捗表示実装

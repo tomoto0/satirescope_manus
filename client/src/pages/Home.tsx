@@ -3,7 +3,88 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
-import { Zap, Settings, TrendingUp, Sparkles } from "lucide-react";
+import { Zap, Settings, TrendingUp, Sparkles, Send } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { useState } from "react";
+import { toast } from "sonner";
+
+/**
+ * Manual Post Section Component
+ */
+function ManualPostSection() {
+  const { data: configs, isLoading, error } = trpc.twitter.getConfigs.useQuery();
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  
+  const manualPostMutation = trpc.twitter.manualPost.useMutation({
+    onSuccess: () => {
+      toast.success("Post published successfully!");
+      setSelectedId(null);
+    },
+    onError: (error) => {
+      toast.error(`Failed to post: ${error.message}`);
+    },
+  });
+
+  const handlePostClick = (configId: number) => {
+    manualPostMutation.mutate({ configId });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="mt-20 bg-slate-800 rounded-lg border border-slate-700 p-8">
+        <h3 className="text-2xl font-bold text-white mb-4">Manual Post</h3>
+        <p className="text-slate-300">Loading configurations...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mt-20 bg-slate-800 rounded-lg border border-slate-700 p-8">
+        <h3 className="text-2xl font-bold text-white mb-4">Manual Post</h3>
+        <p className="text-red-400">Error loading configurations: {error.message}</p>
+      </div>
+    );
+  }
+
+  if (!configs || configs.length === 0) {
+    return (
+      <div className="mt-20 bg-slate-800 rounded-lg border border-slate-700 p-8">
+        <h3 className="text-2xl font-bold text-white mb-4">Manual Post</h3>
+        <p className="text-slate-300">No configurations found. Please configure Twitter API credentials first.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-20 bg-slate-800 rounded-lg border border-slate-700 p-8">
+      <h3 className="text-2xl font-bold text-white mb-4">Manual Post</h3>
+      <p className="text-slate-300 mb-6">
+        Trigger a post immediately without waiting for the hourly scheduler.
+      </p>
+      <div className="space-y-4">
+        {configs.map((config) => (
+          <div key={config.id} className="flex items-center justify-between bg-slate-700 p-4 rounded-lg">
+            <div className="flex-1">
+              <p className="text-white font-semibold">Configuration #{config.id}</p>
+              <p className="text-slate-400 text-sm">
+                {config.isActive ? '🟢 Active' : '🔴 Inactive'}
+              </p>
+            </div>
+            <Button
+              onClick={() => handlePostClick(config.id)}
+              disabled={!config.isActive || manualPostMutation.isPending}
+              className="bg-amber-500 hover:bg-amber-600 text-white flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Send className="w-4 h-4" />
+              {manualPostMutation.isPending ? "Posting..." : "Post Now"}
+            </Button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /**
  * SatireScope Home Page
@@ -179,6 +260,11 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Manual Post Section */}
+        {isAuthenticated && (
+          <ManualPostSection />
+        )}
 
         {/* CTA Section */}
         {isAuthenticated && (

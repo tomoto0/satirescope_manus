@@ -3,14 +3,16 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ExternalLink, Image as ImageIcon, Calendar } from "lucide-react";
+import { ExternalLink, Image as ImageIcon, Calendar, ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useLocation } from "wouter";
 
 /**
  * Posted Tweets Page
  * Displays history of posted tweets with images and source links
  */
 export default function PostedTweets() {
+  const [, setLocation] = useLocation();
   const [selectedConfigId, setSelectedConfigId] = useState<string>("");
 
   // Get user's Twitter configs
@@ -37,10 +39,20 @@ export default function PostedTweets() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Posted Tweets</h1>
-          <p className="text-slate-600">View history of tweets posted to your X accounts</p>
+        {/* Header with Back Button */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-slate-900 mb-2">Posted Tweets</h1>
+            <p className="text-slate-600">View history of tweets posted to your X accounts</p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setLocation("/")}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </Button>
         </div>
 
         {/* Configuration Selector */}

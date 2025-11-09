@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, user_id, is_active, created_at, updated_at FROM twitter_configs LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3tgv6NbJQ4yLEzD.c8a05f3e07a3 --database eq2K3uhXAnhKkfx8kHCxLL --execute SELECT id, user_id, is_active, created_at, updated_at FROM twitter_configs LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "user_id": "1",
+      "is_active": "1",
+      "created_at": "2025-11-06 08:01:47",
+      "updated_at": "2025-11-06 08:01:47"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuser_id\tis_active\tcreated_at\tupdated_at\n1\t1\t1\t2025-11-06 08:01:47\t2025-11-06 08:01:47\n",
+  "stderr": "",
+  "execution_time_ms": 392
+}
