@@ -348,10 +348,45 @@ export async function generateSatireImage(imagePrompt: string): Promise<string> 
       prompt: imagePrompt,
     });
 
-    return result.url;
+    return result.url || "https://via.placeholder.com/800x600?text=Satirical+News+Image";
   } catch (error) {
     console.error("[News Engine] Error generating image:", error);
     // Return a placeholder image URL
     return "https://via.placeholder.com/800x600?text=Satirical+News+Image";
+  }
+}
+
+
+/**
+ * Process a news article: extract, summarize, generate content, and create image
+ * Returns complete content ready for posting
+ */
+export async function processNewsArticle(article: NewsArticle): Promise<GeneratedContent> {
+  console.log(`[News Engine] Processing article: ${article.title}`);
+
+  try {
+    // Step 1: Extract and summarize the article
+    const summary = await extractAndSummarizeArticle(article);
+
+    // Step 2: Generate satirical content
+    const content = await generateContentForNews(article, summary);
+
+    // Step 3: Generate satirical image
+    const imageUrl = await generateSatireImage(content.imagePrompt);
+
+    // Return complete content with image
+    return {
+      ...content,
+      imageUrl,
+    };
+  } catch (error) {
+    console.error(`[News Engine] Error processing article: ${error}`);
+    // Return fallback content
+    return {
+      tweetText: `Breaking: ${article.title.substring(0, 100)}...`,
+      comment: `Check out this news from ${article.source}`,
+      imagePrompt: "A professional news broadcast studio with reporters discussing current events",
+      imageUrl: "https://via.placeholder.com/800x600?text=Satirical+News+Image",
+    };
   }
 }

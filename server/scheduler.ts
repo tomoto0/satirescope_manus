@@ -1,6 +1,6 @@
 import * as cron from "node-cron";
 import { getActiveTwitterConfigs, getTwitterConfigById } from "./db";
-import { runNewsAutomation, processNewsArticle, fetchNewsArticles } from "./newsEngine";
+import { processNewsArticle, fetchNewsArticles } from "./newsEngine";
 import { postTweetWithImage } from "./twitterPoster";
 
 /**
