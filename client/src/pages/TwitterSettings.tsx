@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { AlertCircle, CheckCircle, Trash2, Eye, EyeOff, ArrowLeft, Clock } from "lucide-react";
+import { AlertCircle, CheckCircle, Trash2, Eye, EyeOff, ArrowLeft, Clock, Send } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -20,6 +20,7 @@ export default function TwitterSettings() {
   const [showPasswords, setShowPasswords] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedSchedule, setExpandedSchedule] = useState<number | null>(null);
+  const [postingConfigId, setPostingConfigId] = useState<number | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -87,6 +88,22 @@ export default function TwitterSettings() {
       toast.error(`Failed to update schedule: ${error.message}`);
     },
   });
+
+  const postNowMutation = trpc.twitter.manualPost.useMutation({
+    onSuccess: (data: { success: boolean; message: string }) => {
+      toast.success(data.message || "Tweet posted successfully!");
+      setPostingConfigId(null);
+    },
+    onError: (error: { message: string }) => {
+      toast.error(`Failed to post tweet: ${error.message}`);
+      setPostingConfigId(null);
+    },
+  });
+
+  const handlePostNow = (configId: number) => {
+    setPostingConfigId(configId);
+    postNowMutation.mutate({ configId });
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -432,6 +449,16 @@ export default function TwitterSettings() {
 
                     {/* Action Buttons */}
                     <div className="flex gap-2 pt-2">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handlePostNow(config.id)}
+                        disabled={postingConfigId === config.id || !config.isActive}
+                        className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white"
+                      >
+                        <Send className="w-4 h-4" />
+                        {postingConfigId === config.id ? "Posting..." : "Post Now"}
+                      </Button>
                       <Button
                         variant="destructive"
                         size="sm"

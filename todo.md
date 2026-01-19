@@ -176,3 +176,9 @@
 - [x] client/index.html の OG タグを拡張して画像 URL を追加
 - [x] Twitter Card タグを最適化
 - [x] OG タグが正しく機能しているか確認
+
+
+## Manual Post Button in Configuration Box (v12)
+- [x] TwitterSettings.tsx を確認して、各 Configuration ボックスの構造を把握
+- [x] 各 Configuration ボックスに Post Now ボタンを追加
+- [ ] 手動投稿機能をテストして、正常に動作することを確認
