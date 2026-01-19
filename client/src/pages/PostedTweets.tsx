@@ -3,7 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ExternalLink, Image as ImageIcon, Calendar, ArrowLeft } from "lucide-react";
+import { ExternalLink, Image as ImageIcon, Calendar, ArrowLeft, Twitter } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLocation } from "wouter";
 
@@ -139,9 +139,23 @@ export default function PostedTweets() {
                         </div>
                       )}
 
-                      {/* Source Link */}
-                      {tweet.sourceNewsUrl && (
-                        <div className="pt-2 border-t border-slate-200">
+                      {/* Links Section */}
+                      <div className="pt-2 border-t border-slate-200 flex flex-wrap gap-4">
+                        {/* Twitter URL */}
+                        {tweet.tweetId && (
+                          <a
+                            href={`https://twitter.com/i/web/status/${tweet.tweetId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-sky-500 hover:text-sky-600 text-sm font-medium"
+                          >
+                            <Twitter className="w-4 h-4" />
+                            View on X
+                          </a>
+                        )}
+                        
+                        {/* Source Link */}
+                        {tweet.sourceNewsUrl && (
                           <a
                             href={tweet.sourceNewsUrl}
                             target="_blank"
@@ -151,8 +165,8 @@ export default function PostedTweets() {
                             <ExternalLink className="w-4 h-4" />
                             View Source Article
                           </a>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 ))}

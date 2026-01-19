@@ -191,3 +191,9 @@
 - [x] フロントエンドにダッシュボード UI を作成（グラフ、統計表示）
 - [x] エンゲージメントデータの定期更新機能を実装
 - [x] テストと検証
+
+
+## Twitter URL in Posted Tweets Page (v14)
+- [x] PostedTweets.tsx を確認して各投稿ボックスの構造を把握
+- [x] 各投稿ボックスに Twitter URL リンクを追加
+- Note: 既存のツイートには tweet_id がないため、「View on X」リンクは新しい投稿から表示されます
