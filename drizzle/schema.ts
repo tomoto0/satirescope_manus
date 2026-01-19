@@ -46,9 +46,16 @@ export type InsertTwitterConfig = typeof twitterConfigs.$inferInsert;
 export const postedTweets = mysqlTable("posted_tweets", {
   id: int("id").autoincrement().primaryKey(),
   configId: int("config_id").notNull().references(() => twitterConfigs.id, { onDelete: "cascade" }),
+  tweetId: varchar("tweet_id", { length: 64 }), // Twitter's tweet ID for fetching engagement
   tweetText: text("tweet_text").notNull(),
   imageUrl: text("image_url"),
   sourceNewsUrl: text("source_news_url"),
+  // Engagement metrics
+  likeCount: int("like_count").default(0).notNull(),
+  retweetCount: int("retweet_count").default(0).notNull(),
+  replyCount: int("reply_count").default(0).notNull(),
+  impressionCount: int("impression_count").default(0).notNull(),
+  engagementUpdatedAt: timestamp("engagement_updated_at"),
   postedAt: timestamp("posted_at").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

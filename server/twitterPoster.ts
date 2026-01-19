@@ -94,9 +94,10 @@ export async function postTweetWithImage(
       const tweetId = (tweet.data as any).id;
       console.log(`[Twitter Poster] Tweet posted successfully: ${tweetId}`);
 
-      // Log the posted tweet to database
+      // Log the posted tweet to database with tweetId for engagement tracking
       await createPostedTweet({
         configId: config.id,
+        tweetId: tweetId,
         tweetText: fullTweetText,
         imageUrl: imageUrl,
         sourceNewsUrl: sourceNewsUrl,
@@ -149,9 +150,10 @@ export async function postTweet(
     const tweetId = (tweet.data as any).id;
     console.log(`[Twitter Poster] Tweet posted successfully: ${tweetId}`);
 
-    // Log the posted tweet to database
+    // Log the posted tweet to database with tweetId for engagement tracking
     await createPostedTweet({
       configId: config.id,
+      tweetId: tweetId,
       tweetText: fullTweetText,
       sourceNewsUrl: sourceNewsUrl,
     });
@@ -163,6 +165,138 @@ export async function postTweet(
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("[Twitter Poster] Failed to post tweet:", errorMessage);
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+
+/**
+ * Fetch engagement metrics for a tweet
+ */
+export async function fetchTweetEngagement(
+  config: TwitterConfig,
+  tweetId: string
+): Promise<{
+  success: boolean;
+  engagement?: {
+    likeCount: number;
+    retweetCount: number;
+    replyCount: number;
+    impressionCount: number;
+  };
+  error?: string;
+}> {
+  try {
+    console.log(`[Twitter Poster] Fetching engagement for tweet: ${tweetId}`);
+
+    const client = initializeTwitterClient(config);
+    const rwClient = client.readWrite;
+
+    // Fetch tweet with public metrics
+    const tweet = await rwClient.v2.singleTweet(tweetId, {
+      "tweet.fields": ["public_metrics"],
+    });
+
+    const metrics = (tweet.data as any).public_metrics;
+
+    if (!metrics) {
+      console.log(`[Twitter Poster] No metrics found for tweet: ${tweetId}`);
+      return {
+        success: true,
+        engagement: {
+          likeCount: 0,
+          retweetCount: 0,
+          replyCount: 0,
+          impressionCount: 0,
+        },
+      };
+    }
+
+    console.log(`[Twitter Poster] Engagement fetched for tweet ${tweetId}:`, metrics);
+
+    return {
+      success: true,
+      engagement: {
+        likeCount: metrics.like_count || 0,
+        retweetCount: metrics.retweet_count || 0,
+        replyCount: metrics.reply_count || 0,
+        impressionCount: metrics.impression_count || 0,
+      },
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`[Twitter Poster] Failed to fetch engagement for tweet ${tweetId}:`, errorMessage);
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+
+/**
+ * Fetch engagement metrics for multiple tweets
+ */
+export async function fetchMultipleTweetEngagements(
+  config: TwitterConfig,
+  tweetIds: string[]
+): Promise<{
+  success: boolean;
+  engagements?: Map<string, {
+    likeCount: number;
+    retweetCount: number;
+    replyCount: number;
+    impressionCount: number;
+  }>;
+  error?: string;
+}> {
+  try {
+    if (tweetIds.length === 0) {
+      return {
+        success: true,
+        engagements: new Map(),
+      };
+    }
+
+    console.log(`[Twitter Poster] Fetching engagement for ${tweetIds.length} tweets`);
+
+    const client = initializeTwitterClient(config);
+    const rwClient = client.readWrite;
+
+    // Fetch tweets with public metrics (max 100 per request)
+    const tweets = await rwClient.v2.tweets(tweetIds.slice(0, 100), {
+      "tweet.fields": ["public_metrics"],
+    });
+
+    const engagements = new Map<string, {
+      likeCount: number;
+      retweetCount: number;
+      replyCount: number;
+      impressionCount: number;
+    }>();
+
+    if (tweets.data) {
+      for (const tweet of tweets.data) {
+        const metrics = (tweet as any).public_metrics;
+        engagements.set(tweet.id, {
+          likeCount: metrics?.like_count || 0,
+          retweetCount: metrics?.retweet_count || 0,
+          replyCount: metrics?.reply_count || 0,
+          impressionCount: metrics?.impression_count || 0,
+        });
+      }
+    }
+
+    console.log(`[Twitter Poster] Engagement fetched for ${engagements.size} tweets`);
+
+    return {
+      success: true,
+      engagements,
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`[Twitter Poster] Failed to fetch engagements:`, errorMessage);
     return {
       success: false,
       error: errorMessage,

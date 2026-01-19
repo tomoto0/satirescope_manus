@@ -234,4 +234,112 @@ export async function getPostedTweetsByConfigId(configId: number, limit = 50) {
   }
 }
 
+export async function updateTweetEngagement(
+  tweetDbId: number,
+  engagement: {
+    likeCount: number;
+    retweetCount: number;
+    replyCount: number;
+    impressionCount: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    await db
+      .update(postedTweets)
+      .set({
+        likeCount: engagement.likeCount,
+        retweetCount: engagement.retweetCount,
+        replyCount: engagement.replyCount,
+        impressionCount: engagement.impressionCount,
+        engagementUpdatedAt: new Date(),
+      })
+      .where(eq(postedTweets.id, tweetDbId));
+  } catch (error) {
+    console.error("[Database] Failed to update tweet engagement:", error);
+    throw error;
+  }
+}
+
+export async function getAllPostedTweetsWithEngagement(configId: number, limit = 100) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get posted tweets: database not available");
+    return [];
+  }
+
+  try {
+    const tweets = await db
+      .select()
+      .from(postedTweets)
+      .where(eq(postedTweets.configId, configId))
+      .orderBy(desc(postedTweets.postedAt))
+      .limit(limit);
+    return tweets;
+  } catch (error) {
+    console.error("[Database] Failed to get posted tweets with engagement:", error);
+    throw error;
+  }
+}
+
+export async function getEngagementSummary(configId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get engagement summary: database not available");
+    return null;
+  }
+
+  try {
+    const tweets = await db
+      .select()
+      .from(postedTweets)
+      .where(eq(postedTweets.configId, configId));
+
+    const totalLikes = tweets.reduce((sum, t) => sum + (t.likeCount || 0), 0);
+    const totalRetweets = tweets.reduce((sum, t) => sum + (t.retweetCount || 0), 0);
+    const totalReplies = tweets.reduce((sum, t) => sum + (t.replyCount || 0), 0);
+    const totalImpressions = tweets.reduce((sum, t) => sum + (t.impressionCount || 0), 0);
+
+    return {
+      totalTweets: tweets.length,
+      totalLikes,
+      totalRetweets,
+      totalReplies,
+      totalImpressions,
+      averageLikes: tweets.length > 0 ? Math.round(totalLikes / tweets.length * 10) / 10 : 0,
+      averageRetweets: tweets.length > 0 ? Math.round(totalRetweets / tweets.length * 10) / 10 : 0,
+      averageReplies: tweets.length > 0 ? Math.round(totalReplies / tweets.length * 10) / 10 : 0,
+      averageImpressions: tweets.length > 0 ? Math.round(totalImpressions / tweets.length * 10) / 10 : 0,
+    };
+  } catch (error) {
+    console.error("[Database] Failed to get engagement summary:", error);
+    throw error;
+  }
+}
+
+export async function getTweetsWithTweetId(configId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get tweets with tweet ID: database not available");
+    return [];
+  }
+
+  try {
+    const tweets = await db
+      .select()
+      .from(postedTweets)
+      .where(eq(postedTweets.configId, configId));
+    
+    // Filter tweets that have a tweetId
+    return tweets.filter(t => t.tweetId !== null && t.tweetId !== undefined);
+  } catch (error) {
+    console.error("[Database] Failed to get tweets with tweet ID:", error);
+    throw error;
+  }
+}
+
 // TODO: add feature queries here as your schema grows.

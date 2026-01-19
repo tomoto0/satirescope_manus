@@ -7,6 +7,10 @@ import {
   updateTwitterConfig,
   deleteTwitterConfig,
   getPostedTweetsByConfigId,
+  getAllPostedTweetsWithEngagement,
+  getEngagementSummary,
+  getTweetsWithTweetId,
+  updateTweetEngagement,
 } from "../db";
 import { encryptReversible, decryptReversible } from "../crypto";
 import { TRPCError } from "@trpc/server";
@@ -313,6 +317,127 @@ export const twitterRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to update posting schedule",
+        });
+      }
+    }),
+
+  /**
+   * Get engagement summary for a config
+   */
+  getEngagementSummary: protectedProcedure
+    .input(z.object({ configId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        // Verify ownership
+        const config = await getTwitterConfigById(input.configId);
+        if (!config || config.userId !== ctx.user.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You do not have permission to view this configuration's engagement",
+          });
+        }
+
+        const summary = await getEngagementSummary(input.configId);
+        return summary;
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        console.error("[Twitter Router] Failed to get engagement summary:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch engagement summary",
+        });
+      }
+    }),
+
+  /**
+   * Get all posted tweets with engagement data
+   */
+  getTweetsWithEngagement: protectedProcedure
+    .input(z.object({ configId: z.number(), limit: z.number().default(100) }))
+    .query(async ({ ctx, input }) => {
+      try {
+        // Verify ownership
+        const config = await getTwitterConfigById(input.configId);
+        if (!config || config.userId !== ctx.user.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You do not have permission to view this configuration's tweets",
+          });
+        }
+
+        const tweets = await getAllPostedTweetsWithEngagement(input.configId, input.limit);
+        return tweets;
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        console.error("[Twitter Router] Failed to get tweets with engagement:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch tweets with engagement",
+        });
+      }
+    }),
+
+  /**
+   * Refresh engagement data for all tweets of a config
+   */
+  refreshEngagement: protectedProcedure
+    .input(z.object({ configId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        // Verify ownership
+        const config = await getTwitterConfigById(input.configId);
+        if (!config || config.userId !== ctx.user.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You do not have permission to refresh this configuration's engagement",
+          });
+        }
+
+        // Import engagement fetcher
+        const { fetchMultipleTweetEngagements } = await import("../twitterPoster");
+
+        // Get tweets with tweetId
+        const tweets = await getTweetsWithTweetId(input.configId);
+        if (tweets.length === 0) {
+          return {
+            success: true,
+            message: "No tweets with Twitter IDs found to refresh",
+            updatedCount: 0,
+          };
+        }
+
+        // Fetch engagement from Twitter API
+        const tweetIds = tweets.map(t => t.tweetId!).filter(Boolean);
+        const result = await fetchMultipleTweetEngagements(config, tweetIds);
+
+        if (!result.success || !result.engagements) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: result.error || "Failed to fetch engagement from Twitter",
+          });
+        }
+
+        // Update engagement in database
+        let updatedCount = 0;
+        for (const tweet of tweets) {
+          if (tweet.tweetId && result.engagements.has(tweet.tweetId)) {
+            const engagement = result.engagements.get(tweet.tweetId)!;
+            await updateTweetEngagement(tweet.id, engagement);
+            updatedCount++;
+          }
+        }
+
+        return {
+          success: true,
+          message: `Engagement data refreshed for ${updatedCount} tweets`,
+          updatedCount,
+        };
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        console.error("[Twitter Router] Failed to refresh engagement:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error instanceof Error ? error.message : "Failed to refresh engagement data",
         });
       }
     }),

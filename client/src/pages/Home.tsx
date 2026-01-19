@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
-import { Zap, Settings, TrendingUp, Sparkles, Send } from "lucide-react";
+import { Zap, Settings, TrendingUp, Sparkles, Send, BarChart3 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -118,6 +118,11 @@ export default function Home() {
                 <Link href="/tweets">
                   <Button variant="ghost" className="text-white hover:bg-slate-700">
                     Posted Tweets
+                  </Button>
+                </Link>
+                <Link href="/analytics">
+                  <Button variant="ghost" className="text-white hover:bg-slate-700">
+                    Analytics
                   </Button>
                 </Link>
                 <Button
