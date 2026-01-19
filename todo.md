@@ -169,3 +169,10 @@
 - [x] og:title, og:description を追加
 - [x] twitter:card, twitter:title, twitter:description を追加
 - [x] アクセシビリティ属性（role, aria-label）を追加
+
+
+## Open Graph (OG) Tags Implementation (v11)
+- [x] OG 画像を作成して public フォルダに配置
+- [x] client/index.html の OG タグを拡張して画像 URL を追加
+- [x] Twitter Card タグを最適化
+- [x] OG タグが正しく機能しているか確認
