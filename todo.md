@@ -160,3 +160,12 @@
 - [x] scheduler.ts でスケジューラーを正しく停止/再設定できるか検証
 - [x] Active/Inactive 変更時にスケジューラーを再設定するロジックを実装
 - [ ] Active/Inactive 切り替え機能をテストして、正常に動作することを検証
+
+
+## SEO Optimization (v10)
+- [x] メタディスクリプション（157文字）を追加
+- [x] メタキーワードを追加
+- [x] ページタイトル（56文字）を document.title で設定
+- [x] og:title, og:description を追加
+- [x] twitter:card, twitter:title, twitter:description を追加
+- [x] アクセシビリティ属性（role, aria-label）を追加

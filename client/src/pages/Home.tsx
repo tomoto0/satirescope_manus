@@ -5,7 +5,7 @@ import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
 import { Zap, Settings, TrendingUp, Sparkles, Send } from "lucide-react";
 import { trpc } from "@/lib/trpc";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 /**
@@ -93,8 +93,12 @@ function ManualPostSection() {
 export default function Home() {
   const { user, isAuthenticated, logout } = useAuth();
 
+  useEffect(() => {
+    document.title = "SatireScope - Automated Satirical News Posting to X";
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" role="main" aria-label="SatireScope home page">
       {/* Navigation */}
       <nav className="border-b border-slate-700 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
