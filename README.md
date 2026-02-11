@@ -53,7 +53,7 @@ The platform is designed for content creators, satirical news accounts, and soci
 
 ### System Architecture
 
-![Architecture Diagram](./docs/images/architecture-diagram.png)
+![Architecture Diagram](architecture-diagram.png)
 
 ### Technology Stack
 
