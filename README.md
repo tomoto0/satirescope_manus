@@ -2,7 +2,7 @@
 
 **Automated Satirical News Posting to X (Twitter)**
 
-![SatireScope OGP](./docs/images/ogp-satirescope.png)
+![SatireScope OGP](ogp-satirescope.png)
 
 ---
 
