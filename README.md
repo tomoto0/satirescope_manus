@@ -2,7 +2,7 @@
 
 **Automated Satirical News Posting to X (Twitter)**
 
-![SatireScope OGP](https://files.manuscdn.com/user_upload_by_module/session_file/91234476/WDcROYKUPkNCbVyG.png)
+![SatireScope OGP](./docs/images/ogp-satirescope.png)
 
 ---
 
@@ -53,7 +53,7 @@ The platform is designed for content creators, satirical news accounts, and soci
 
 ### System Architecture
 
-![Architecture Diagram](https://private-us-east-1.manuscdn.com/sessionFile/sCH6hK6A482YnBvfMtrEP6/sandbox/teI77ZQPsCXRzCaMvIGfoa-img-1_1770843261000_na1fn_YXJjaGl0ZWN0dXJlLWRpYWdyYW0.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvc0NINmhLNkE0ODJZbkJ2Zk10ckVQNi9zYW5kYm94L3RlSTc3WlFQc0NYUnpDYU12SUdmb2EtaW1nLTFfMTc3MDg0MzI2MTAwMF9uYTFmbl9ZWEpqYUdsMFpXTjBkWEpsTFdScFlXZHlZVzAucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=oNkHK36VZ2N8m85wX0QYJJFSLfXTxqNjWNZxvUpNIIKsNlUAJCdC-tDg4cCqJ-Q68tdBmudQbyg1jZbf2sra2z4k7LjomqxffC6C~xuZVLrdWHGFCCr8g7OZRAC0fAYNPix8Q1jHPscEOritx9GytqTFwWfYeh0j3s01Uoepo8UYvqPK3x4srdmXFSxmOMmZ1dnHfYg-dHFg4fuSxVsJFym6JUE8ifm2EdARRJMnNniS10imo38CFHtBey-2Ai~ByV~es6JY3ajVUIFSIG6sBOBXv4S8ilvMFqHrJFzYyZM2~R014IE~hwbe~UOVXt4qo88lfUF3fvWNjZCZMDiFig__)
+![Architecture Diagram](./docs/images/architecture-diagram.png)
 
 ### Technology Stack
 
